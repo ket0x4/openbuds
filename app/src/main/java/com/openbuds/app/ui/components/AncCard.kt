@@ -43,7 +43,6 @@ import com.adamglin.PhosphorIcons
 import com.adamglin.phosphoricons.Duotone
 import com.adamglin.phosphoricons.duotone.Waveform
 import com.openbuds.app.ui.icons.AncModeExpressiveIcon
-import com.openbuds.app.ui.theme.ExpressiveIconBadge
 import com.openbuds.app.ui.theme.ExpressiveStyleableCard
 import com.openbuds.app.ui.theme.expressiveExpandTransition
 import com.openbuds.app.ui.theme.expressiveShrinkTransition
@@ -64,22 +63,11 @@ fun ExpressiveAncCard(
 
     ExpressiveStyleableCard(modifier = modifier.fillMaxWidth()) {
         Column {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                ExpressiveIconBadge(
-                    icon = PhosphorIcons.Duotone.Waveform,
-                    polygon = MaterialShapes.Cookie9Sided,
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Text(
-                    text = "Noise Control",
-                    style = MaterialTheme.typography.titleMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            ExpressiveSectionHeader(
+                icon = PhosphorIcons.Duotone.Waveform,
+                title = "Noise Control",
+                polygon = MaterialShapes.Cookie9Sided
+            )
 
             Spacer(modifier = Modifier.height(14.dp))
 
