@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.graphics.shapes.RoundedPolygon
 import com.openbuds.app.ui.theme.ExpressiveIconBadge
@@ -31,6 +32,7 @@ fun ExpressiveSectionHeader(
     polygon: RoundedPolygon = MaterialShapes.SoftBurst,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    titleStyle: TextStyle = MaterialTheme.typography.titleMediumEmphasized,
     trailing: (@Composable () -> Unit)? = null
 ) {
     Row(
@@ -54,7 +56,7 @@ fun ExpressiveSectionHeader(
             )
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleMediumEmphasized
+                style = titleStyle
             )
         }
 
