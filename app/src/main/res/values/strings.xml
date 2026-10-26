@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">OpenBuds</string>
+    <string name="battery_widget_name">Battery Status</string>
+    <string name="battery_widget_description">Battery for your FreeBuds 5i and case, with quick noise-control switching</string>
+</resources>

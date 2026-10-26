@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Static picker preview for Android 12-14 (API 35+ uses the generated Glance preview). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_widget_preview"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FreeBuds 5i"
+        android:textColor="@android:color/system_neutral1_900"
+        android:textSize="14sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView style="@style/WidgetPreviewValue" android:drawableTop="@drawable/ic_earbud_left" android:text="82%" />
+        <TextView style="@style/WidgetPreviewValue" android:drawableTop="@drawable/ic_earbud_right" android:text="76%" />
+        <TextView style="@style/WidgetPreviewValue" android:drawableTop="@drawable/ic_earbuds_case" android:text="54%" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="36dp"
+        android:orientation="horizontal">
+
+        <ImageView style="@style/WidgetPreviewPill" android:backgroundTint="@android:color/system_accent1_600" android:src="@drawable/ic_noise_cancel" android:tint="@android:color/white" />
+        <ImageView style="@style/WidgetPreviewPill" android:src="@drawable/ic_noise_awareness" />
+        <ImageView style="@style/WidgetPreviewPill" android:src="@drawable/ic_noise_off" />
+    </LinearLayout>
+</LinearLayout>

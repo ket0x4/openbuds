@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Ambient Ripple Waves (Duotone) -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeAlpha="0.45"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M3.2,6.2 C1.6,9.8 1.6,14.2 3.2,17.8 M20.8,6.2 C22.4,9.8 22.4,14.2 20.8,17.8" />
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeAlpha="0.85"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M6.0,8.2 C4.8,10.5 4.8,13.5 6.0,15.8 M18.0,8.2 C19.2,10.5 19.2,13.5 18.0,15.8" />
+    <!-- Center Earbud Receiving Ambient Sound -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.4,6.5 C9.4,6.5 7.9,8.0 7.9,9.9 C7.9,11.2 8.7,12.3 9.8,12.9 L9.8,17.0 C9.8,17.8 10.5,18.5 11.3,18.5 C12.1,18.5 12.8,17.8 12.8,17.0 L12.8,13.0 C13.7,12.6 14.3,11.8 14.6,10.9 L15.8,11.1 C16.6,11.1 17.2,10.5 17.2,9.7 C17.2,8.9 16.6,8.3 15.8,8.3 L14.5,8.5 C14.0,7.3 12.8,6.5 11.4,6.5 Z" />
+</vector>

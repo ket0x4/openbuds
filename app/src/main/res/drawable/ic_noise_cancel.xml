@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Outer Acoustic Shield Halo (Duotone) -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:fillAlpha="0.22"
+        android:pathData="M12,3 A9,9 0 1,0 12.001,3 Z" />
+    <!-- Active Anti-Phase Wave Rings -->
+    <path
+        android:strokeColor="#FFFFFFFF"
+        android:strokeAlpha="0.55"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:pathData="M4.2,7.5 C2.6,10.2 2.6,13.8 4.2,16.5 M19.8,7.5 C21.4,10.2 21.4,13.8 19.8,16.5" />
+    <!-- Inner Quiet Core & Earbud Silhouette -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M11.2,6.2 C9.1,6.2 7.5,7.8 7.5,9.8 C7.5,11.2 8.3,12.4 9.5,13.0 L9.5,17.3 C9.5,18.2 10.2,18.9 11.1,18.9 C12.0,18.9 12.7,18.2 12.7,17.3 L12.7,13.1 C13.6,12.7 14.3,11.9 14.6,10.9 L16.2,11.2 C17.1,11.2 17.8,10.5 17.8,9.6 C17.8,8.7 17.1,8.0 16.2,8.0 L14.5,8.3 C13.9,7.0 12.7,6.2 11.2,6.2 Z" />
+</vector>

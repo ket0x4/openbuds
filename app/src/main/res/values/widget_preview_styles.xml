@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="WidgetPreviewValue">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:drawableTint">@android:color/system_accent1_600</item>
+        <item name="android:textColor">@android:color/system_neutral1_900</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="WidgetPreviewPill">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginHorizontal">3dp</item>
+        <item name="android:padding">9dp</item>
+        <item name="android:background">@drawable/bg_notif_pill</item>
+        <item name="android:backgroundTint">@android:color/system_accent2_100</item>
+        <item name="android:tint">@android:color/system_accent2_900</item>
+    </style>
+</resources>

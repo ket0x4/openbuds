@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Use with NotificationCompat.Builder.setSmallIcon(id, level) where level = lowest bud percent. -->
+<level-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:maxLevel="12" android:drawable="@drawable/ic_stat_buds_0" />
+    <item android:maxLevel="37" android:drawable="@drawable/ic_stat_buds_1" />
+    <item android:maxLevel="62" android:drawable="@drawable/ic_stat_buds_2" />
+    <item android:maxLevel="87" android:drawable="@drawable/ic_stat_buds_3" />
+    <item android:maxLevel="100" android:drawable="@drawable/ic_stat_buds_4" />
+</level-list>
