@@ -9,6 +9,7 @@ import com.openbuds.core.model.DeviceInfo
 import com.openbuds.core.model.DeviceSettings
 import com.openbuds.core.model.DualConnectState
 import com.openbuds.core.model.EqPreset
+import com.openbuds.core.model.FitTestResult
 import com.openbuds.core.model.GestureAction
 import com.openbuds.core.model.GestureType
 import com.openbuds.core.model.HoldAncModes
@@ -24,6 +25,7 @@ interface HeadphonesDriver {
     val inEarStatus: StateFlow<InEarStatus>
     val settings: StateFlow<DeviceSettings>
     val dualConnectState: StateFlow<DualConnectState>
+    val fitTestResult: StateFlow<FitTestResult>
 
     suspend fun start()
     suspend fun refreshAll()
@@ -38,6 +40,8 @@ interface HeadphonesDriver {
     }
     suspend fun setGesture(type: GestureType, action: GestureAction)
     suspend fun setHoldAncModes(modes: HoldAncModes)
+    suspend fun startFitTest()
+    suspend fun stopFitTest()
 
     // Multi-device (Dual Connect) operations
     suspend fun refreshDualConnect()

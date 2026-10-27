@@ -25,6 +25,7 @@ object HuaweiConstants {
     const val COMMAND_HOLD_GET = 29
     const val COMMAND_SWIPE_SET = 30
     const val COMMAND_SWIPE_GET = 31
+    const val COMMAND_FIT_TEST = 38
     const val COMMAND_ANC_STATUS = 42
 
     // Dual Connect (Multi-device) - Service 43 (0x2b)

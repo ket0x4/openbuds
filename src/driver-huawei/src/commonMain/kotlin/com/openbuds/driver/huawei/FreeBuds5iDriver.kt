@@ -12,6 +12,9 @@ import com.openbuds.core.model.DualConnectConnectionState
 import com.openbuds.core.model.DualConnectDevice
 import com.openbuds.core.model.DualConnectState
 import com.openbuds.core.model.EqPreset
+import com.openbuds.core.model.FitResult
+import com.openbuds.core.model.FitTestResult
+import com.openbuds.core.model.FitTestStatus
 import com.openbuds.core.model.GestureAction
 import com.openbuds.core.model.GestureType
 import com.openbuds.core.model.HoldAncModes
@@ -66,6 +69,9 @@ class FreeBuds5iDriver(
 
     private val _dualConnectState = MutableStateFlow(DualConnectState())
     override val dualConnectState: StateFlow<DualConnectState> = _dualConnectState.asStateFlow()
+
+    private val _fitTestResult = MutableStateFlow(FitTestResult())
+    override val fitTestResult: StateFlow<FitTestResult> = _fitTestResult.asStateFlow()
 
     override suspend fun start() {
         readerJob = scope.launch {
@@ -374,6 +380,28 @@ class FreeBuds5iDriver(
         }
     }
 
+    override suspend fun startFitTest() {
+        _fitTestResult.value = FitTestResult(status = FitTestStatus.TESTING)
+        sendCommand(
+            MbbCommand(
+                HuaweiConstants.SERVICE_SETTINGS,
+                HuaweiConstants.COMMAND_FIT_TEST,
+                mapOf(1 to byteArrayOf(1))
+            )
+        )
+    }
+
+    override suspend fun stopFitTest() {
+        sendCommand(
+            MbbCommand(
+                HuaweiConstants.SERVICE_SETTINGS,
+                HuaweiConstants.COMMAND_FIT_TEST,
+                mapOf(1 to byteArrayOf(0))
+            )
+        )
+        _fitTestResult.value = FitTestResult(status = FitTestStatus.IDLE)
+    }
+
     private suspend fun executeDualConnectCommand(actionCode: Int, macAddress: String) {
         val macBytes = macToBytes(macAddress)
         if (macBytes.size != 6) return
@@ -495,6 +523,7 @@ class FreeBuds5iDriver(
                 HuaweiConstants.COMMAND_SOUND_QUALITY_GET -> handleSoundQuality(cmd)
                 HuaweiConstants.COMMAND_DUAL_CONNECT_ENABLED_GET -> handleDualConnectEnabled(cmd)
                 HuaweiConstants.COMMAND_DUAL_CONNECT_ENUMERATE -> handleDualConnectDeviceRow(cmd)
+                HuaweiConstants.COMMAND_FIT_TEST -> handleFitTest(cmd)
                 HuaweiConstants.COMMAND_DUAL_CONNECT_CHANGE_EVENT -> {
                     scope.launch { refreshDualConnect() }
                 }
@@ -575,6 +604,23 @@ class FreeBuds5iDriver(
                 rightInEar = if (right != null) right == 1 else current.rightInEar
             )
         }
+    }
+
+    private fun handleFitTest(cmd: MbbCommand) {
+        val leftCode = cmd.args[1]?.firstOrNull()?.toInt() ?: 0
+        val rightCode = cmd.args[2]?.firstOrNull()?.toInt() ?: 0
+
+        fun codeToResult(code: Int): FitResult = when (code) {
+            1 -> FitResult.GOOD
+            2 -> FitResult.POOR
+            else -> FitResult.UNKNOWN
+        }
+
+        _fitTestResult.value = FitTestResult(
+            status = FitTestStatus.COMPLETED,
+            leftResult = codeToResult(leftCode),
+            rightResult = codeToResult(rightCode)
+        )
     }
 
     private fun handleAutoPause(cmd: MbbCommand) {

@@ -7,6 +7,9 @@ import com.openbuds.core.model.CodecPreference
 import com.openbuds.core.model.DeviceInfo
 import com.openbuds.core.model.DualConnectConnectionState
 import com.openbuds.core.model.EqPreset
+import com.openbuds.core.model.FitResult
+import com.openbuds.core.model.FitTestResult
+import com.openbuds.core.model.FitTestStatus
 import com.openbuds.core.model.HoldAncModes
 import com.openbuds.core.protocol.MbbCommand
 import com.openbuds.core.protocol.MbbParser
@@ -311,6 +314,53 @@ class FreeBuds5iDriverTest {
         assertEquals(HoldAncModes.ANC_AND_AWARENESS, driver.settings.value.gestures.holdAncModes)
         assertEquals("1.0.0.178", driver.deviceInfo.value.firmwareVersion)
         assertEquals("Ver.A", driver.deviceInfo.value.hardwareVersion)
+
+        driver.close()
+    }
+
+    @Test
+    fun testFitTestExecutionAndResults() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        assertEquals(FitTestStatus.IDLE, driver.fitTestResult.value.status)
+
+        // Start fit test
+        driver.startFitTest()
+        advanceUntilIdle()
+        assertEquals(FitTestStatus.TESTING, driver.fitTestResult.value.status)
+
+        // Emit fit test results packet (Left = Good, Right = Poor)
+        val resultPacket = MbbSerializer.serialize(
+            MbbCommand(
+                serviceId = 43,
+                commandId = HuaweiConstants.COMMAND_FIT_TEST,
+                args = mapOf(
+                    1 to byteArrayOf(1), // Good
+                    2 to byteArrayOf(2)  // Poor
+                )
+            )
+        )
+        fakeTransport.incomingFlow.emit(resultPacket)
+        advanceUntilIdle()
+
+        val result = driver.fitTestResult.value
+        assertEquals(FitTestStatus.COMPLETED, result.status)
+        assertEquals(FitResult.GOOD, result.leftResult)
+        assertEquals(FitResult.POOR, result.rightResult)
+
+        // Stop/reset fit test
+        driver.stopFitTest()
+        advanceUntilIdle()
+        assertEquals(FitTestStatus.IDLE, driver.fitTestResult.value.status)
 
         driver.close()
     }

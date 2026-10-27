@@ -6,11 +6,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.openbuds.app.bluetooth.DiscoveredDevice
+import com.openbuds.app.ui.components.EartipFitTestDialog
 import com.openbuds.app.ui.components.ExpressiveAncCard
+import com.openbuds.app.ui.components.ExpressiveEartipFitCard
 import com.openbuds.app.ui.components.ExpressiveScreenScaffold
 import com.openbuds.app.ui.screens.dashboard.HeroHardwareStage
 import com.openbuds.app.ui.screens.dashboard.QuickStatusSummaryRow
@@ -26,6 +32,7 @@ import com.openbuds.core.model.ConnectionState
 import com.openbuds.core.model.DeviceInfo
 import com.openbuds.core.model.DeviceSettings
 import com.openbuds.core.model.DualConnectState
+import com.openbuds.core.model.FitTestResult
 import com.openbuds.core.model.InEarStatus
 
 /**
@@ -53,9 +60,13 @@ fun DashboardScreen(
     modifier: Modifier = Modifier,
     dualConnectState: DualConnectState = DualConnectState(),
     a2dpCodecStatus: A2dpCodecStatus = A2dpCodecStatus(),
+    fitTestResult: FitTestResult = FitTestResult(),
+    onStartFitTest: suspend () -> Unit = {},
+    onStopFitTest: suspend () -> Unit = {},
     onNavigateToDevices: () -> Unit = {}
 ) {
     val isConnected = connectionState is ConnectionState.Connected
+    var showFitTestDialog by remember { mutableStateOf(false) }
 
     ExpressiveScreenScaffold(
         modifier = modifier,
@@ -99,6 +110,11 @@ fun DashboardScreen(
                     onLevelSelected = onLevelSelected
                 )
 
+                ExpressiveEartipFitCard(
+                    fitTestResult = fitTestResult,
+                    onOpenFitTest = { showFitTestDialog = true }
+                )
+
                 QuickStatusSummaryRow(
                     eqPreset = deviceSettings.audio.eqPreset,
                     codecName = a2dpCodecStatus.activeCodecName,
@@ -109,6 +125,16 @@ fun DashboardScreen(
                     onNavigateToGestures = onNavigateToGestures
                 )
             }
+        }
+
+        if (showFitTestDialog) {
+            EartipFitTestDialog(
+                inEarStatus = inEarStatus,
+                fitTestResult = fitTestResult,
+                onStartTest = onStartFitTest,
+                onStopTest = onStopFitTest,
+                onDismiss = { showFitTestDialog = false }
+            )
         }
     }
 }

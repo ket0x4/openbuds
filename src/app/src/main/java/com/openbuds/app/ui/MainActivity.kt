@@ -106,6 +106,7 @@ import com.openbuds.core.model.ConnectionState
 import com.openbuds.core.model.DeviceInfo
 import com.openbuds.core.model.DeviceSettings
 import com.openbuds.core.model.DualConnectState
+import com.openbuds.core.model.FitTestResult
 import com.openbuds.core.model.InEarStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -322,6 +323,7 @@ class MainActivity : ComponentActivity() {
                 val inEarStatus by (driver?.inEarStatus?.collectAsState() ?: remember { mutableStateOf(InEarStatus()) })
                 val deviceSettings by (driver?.settings?.collectAsState() ?: remember { mutableStateOf(DeviceSettings()) })
                 val dualConnectState by (driver?.dualConnectState?.collectAsState() ?: remember { mutableStateOf(DualConnectState()) })
+                val fitTestResult by (driver?.fitTestResult?.collectAsState() ?: remember { mutableStateOf(FitTestResult()) })
                 val deviceInfo by (driver?.deviceInfo?.collectAsState() ?: remember {
                     mutableStateOf(DeviceInfo(name = "HUAWEI FreeBuds 5i", macAddress = "00:00:00:00:00:00"))
                 })
@@ -395,6 +397,7 @@ class MainActivity : ComponentActivity() {
                                             inEarStatus = inEarStatus,
                                             deviceSettings = deviceSettings,
                                             pairedDevices = pairedDevices,
+                                            fitTestResult = fitTestResult,
                                             onConnectDevice = { connectionManager.connectToDevice(it) },
                                             onDisconnect = { connectionManager.disconnect() },
                                             onModeSelected = { mode ->
@@ -402,6 +405,12 @@ class MainActivity : ComponentActivity() {
                                             },
                                             onLevelSelected = { level ->
                                                 coroutineScope.launch { driver?.setAncLevel(level) }
+                                            },
+                                            onStartFitTest = {
+                                                driver?.startFitTest()
+                                            },
+                                            onStopFitTest = {
+                                                driver?.stopFitTest()
                                             },
                                             onRefreshAll = {
                                                 coroutineScope.launch {
