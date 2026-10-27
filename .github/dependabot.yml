@@ -10,6 +10,12 @@ updates:
       gradle-dependencies:
         patterns:
           - "*"
+    ignore:
+      # Compose Foundation 1.13.x requires compileSdk 37.1 or newer.
+      # Remove this once the project moves to that platform.
+      - dependency-name: "androidx.compose.foundation:foundation"
+        update-types:
+          - version-update:semver-minor
 
   - package-ecosystem: github-actions
     directory: /
