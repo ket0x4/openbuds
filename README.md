@@ -72,7 +72,7 @@ Controls and system integration
 ## Requirements
 
 - JDK 17 or newer (CI uses JDK 21)
-- Android SDK Platform 37 and Build-Tools 37.0.0 or newer
+- Android SDK Platform 37 and Build-Tools 36.0.0 or newer
 - Android Studio with support for AGP 9.0
 - An Android device with API 31 or newer and Bluetooth Classic (RFCOMM)
 
