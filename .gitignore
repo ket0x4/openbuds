@@ -1,11 +1,33 @@
-*.iml
-.gradle
-/local.properties
-/.idea/
-.DS_Store
+# Gradle
+.gradle/
+.kotlin/
 build/
-*/build/
-/captures
-.externalNativeBuild
-.cxx
+
+# Local configuration
 local.properties
+*.hprof
+
+# Android
+captures/
+.externalNativeBuild/
+.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Signing material
+*.jks
+*.keystore
+keystore.properties
+
+# IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Operating system
+.DS_Store
+Thumbs.db
