@@ -1,8 +1,14 @@
 package com.openbuds.app
 
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import com.openbuds.app.status.BatteryTone
 import com.openbuds.app.status.StatusFormat
 import com.openbuds.app.widget.BatteryWidgetKeys
+import com.openbuds.app.widget.WidgetFormat
+import com.openbuds.app.widget.WidgetSizes
+import com.openbuds.app.widget.WidgetSnapshot
+import com.openbuds.app.widget.statusLabel
 import com.openbuds.core.model.AncMode
 import com.openbuds.core.model.BatteryStatus
 import org.junit.Assert.assertEquals
@@ -59,5 +65,27 @@ class BatteryWidgetTest {
     fun testIconLevel() {
         assertEquals(0, StatusFormat.iconLevel(BatteryStatus()))
         assertEquals(40, StatusFormat.iconLevel(BatteryStatus(leftPercent = 40, rightPercent = 90)))
+    }
+
+    @Test
+    fun testResponsiveLayoutBreakpoints() {
+        assertEquals(WidgetFormat.TINY, WidgetFormat.forSize(WidgetSizes.TINY))
+        assertEquals(WidgetFormat.ROW, WidgetFormat.forSize(WidgetSizes.ROW))
+        assertEquals(WidgetFormat.SQUARE, WidgetFormat.forSize(WidgetSizes.SQUARE))
+        assertEquals(WidgetFormat.WIDE, WidgetFormat.forSize(WidgetSizes.WIDE))
+
+        // Sizes between breakpoints resolve to the largest layout that still fits.
+        assertEquals(WidgetFormat.ROW, WidgetFormat.forSize(DpSize(180.dp, 60.dp)))
+        assertEquals(WidgetFormat.SQUARE, WidgetFormat.forSize(DpSize(180.dp, 110.dp)))
+    }
+
+    @Test
+    fun testWidgetStatusLabel() {
+        assertEquals("Disconnected", statusLabel(WidgetSnapshot(BatteryStatus(), isConnected = false, ancMode = null)))
+        assertEquals("Connected", statusLabel(WidgetSnapshot(BatteryStatus(), isConnected = true, ancMode = null)))
+        assertEquals(
+            "Noise cancelling",
+            statusLabel(WidgetSnapshot(BatteryStatus(), isConnected = true, ancMode = AncMode.NOISE_CANCELLATION)),
+        )
     }
 }
