@@ -9,11 +9,12 @@ plugins {
 android {
     namespace = "com.openbuds.app"
     compileSdk = 37
+    compileSdkMinor = 1
 
     defaultConfig {
         applicationId = "com.openbuds.app"
         minSdk = 31
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 1
         versionName = "1.0.0"
 

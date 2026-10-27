@@ -72,8 +72,8 @@ Controls and system integration
 ## Requirements
 
 - JDK 17 or newer (CI uses JDK 21)
-- Android SDK Platform 37 and Build-Tools 36.0.0 or newer
-- Android Studio with support for AGP 9.0
+- Android SDK Platform 37.1 and Build-Tools 36.0.0 or newer
+- Android Studio with support for AGP 9.4
 - An Android device with API 31 or newer and Bluetooth Classic (RFCOMM)
 
 Build configuration:
@@ -81,8 +81,8 @@ Build configuration:
 | Setting | Value |
 | --- | --- |
 | `minSdk` | 31 |
-| `targetSdk` | 36 |
-| `compileSdk` | 37 |
+| `targetSdk` | 37 |
+| `compileSdk` | 37.1 |
 | Kotlin | 2.4.21 |
 | Gradle | 9.8.2 |
 | AGP | 9.4.1 |
