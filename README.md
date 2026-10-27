@@ -113,6 +113,27 @@ cd src
 
 The debug APK is written to `src/app/build/outputs/apk/debug/app-debug.apk`.
 
+## Release signing
+
+Release builds read signing material from `src/keystore.properties`, which is gitignored along with the keystore directory itself. Create the file locally:
+
+```properties
+storeFile=keystore/ket.jks
+storePassword=<store password>
+keyAlias=ket
+keyPassword=<key password>
+```
+
+Then build:
+
+```bash
+./src/gradlew -p src :app:assembleRelease
+```
+
+The signed APK is written to `src/app/build/outputs/apk/release/app-release.apk`.
+
+If `src/keystore.properties` is absent, the release build still succeeds but produces an unsigned APK. That keeps CI usable without secrets and prevents a debug-signed artifact from being published by accident.
+
 ## Testing and lint
 
 ```bash

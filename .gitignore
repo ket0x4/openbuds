@@ -19,7 +19,9 @@ captures/
 # Signing material
 *.jks
 *.keystore
+*.p12
 keystore.properties
+src/keystore/
 
 # IDEs
 .idea/
