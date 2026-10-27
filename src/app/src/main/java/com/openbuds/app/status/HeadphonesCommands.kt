@@ -28,6 +28,20 @@ object HeadphonesCommands {
         return runCatching { driver.setAncMode(mode) }.isSuccess
     }
 
+    fun nextAncMode(current: AncMode?): AncMode = when (current) {
+        AncMode.NOISE_CANCELLATION -> AncMode.TRANSPARENCY
+        AncMode.TRANSPARENCY -> AncMode.OFF
+        AncMode.OFF, null -> AncMode.NOISE_CANCELLATION
+    }
+
+    suspend fun cycleAnc(context: Context): AncMode? {
+        val manager = manager(context) ?: return null
+        val currentMode = manager.activeDriver.value?.ancMode?.value ?: AncMode.OFF
+        val next = nextAncMode(currentMode)
+        val success = setAncMode(context, next)
+        return if (success) next else null
+    }
+
     suspend fun reconnect(context: Context) {
         val driver = awaitDriver(context) ?: return
         runCatching { driver.refreshAll() }

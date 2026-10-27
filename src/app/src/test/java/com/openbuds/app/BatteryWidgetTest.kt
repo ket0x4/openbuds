@@ -3,6 +3,7 @@ package com.openbuds.app
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.openbuds.app.status.BatteryTone
+import com.openbuds.app.status.HeadphonesCommands
 import com.openbuds.app.status.StatusFormat
 import com.openbuds.app.widget.BatteryWidgetKeys
 import com.openbuds.app.widget.WidgetFormat
@@ -87,5 +88,13 @@ class BatteryWidgetTest {
             "Noise cancelling",
             statusLabel(WidgetSnapshot(BatteryStatus(), isConnected = true, ancMode = AncMode.NOISE_CANCELLATION)),
         )
+    }
+
+    @Test
+    fun testNextAncModeCycle() {
+        assertEquals(AncMode.NOISE_CANCELLATION, HeadphonesCommands.nextAncMode(AncMode.OFF))
+        assertEquals(AncMode.NOISE_CANCELLATION, HeadphonesCommands.nextAncMode(null))
+        assertEquals(AncMode.TRANSPARENCY, HeadphonesCommands.nextAncMode(AncMode.NOISE_CANCELLATION))
+        assertEquals(AncMode.OFF, HeadphonesCommands.nextAncMode(AncMode.TRANSPARENCY))
     }
 }

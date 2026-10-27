@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="toggle_anc"
+        android:enabled="true"
+        android:icon="@drawable/ic_noise_cancel"
+        android:shortcutShortLabel="@string/shortcut_toggle_anc_short"
+        android:shortcutLongLabel="@string/shortcut_toggle_anc_long">
+        <intent
+            android:action="com.openbuds.app.action.TOGGLE_ANC"
+            android:targetPackage="com.openbuds.app"
+            android:targetClass="com.openbuds.app.ui.MainActivity" />
+    </shortcut>
+    <shortcut
+        android:shortcutId="audio_eq"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_audio"
+        android:shortcutShortLabel="@string/shortcut_audio_short"
+        android:shortcutLongLabel="@string/shortcut_audio_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.openbuds.app"
+            android:targetClass="com.openbuds.app.ui.MainActivity">
+            <extra android:name="route" android:value="audio" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="devices"
+        android:enabled="true"
+        android:icon="@drawable/ic_shortcut_devices"
+        android:shortcutShortLabel="@string/shortcut_devices_short"
+        android:shortcutLongLabel="@string/shortcut_devices_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.openbuds.app"
+            android:targetClass="com.openbuds.app.ui.MainActivity">
+            <extra android:name="route" android:value="devices" />
+        </intent>
+    </shortcut>
+    <shortcut
+        android:shortcutId="reconnect"
+        android:enabled="true"
+        android:icon="@drawable/ic_refresh"
+        android:shortcutShortLabel="@string/shortcut_reconnect_short"
+        android:shortcutLongLabel="@string/shortcut_reconnect_long">
+        <intent
+            android:action="com.openbuds.app.action.RECONNECT"
+            android:targetPackage="com.openbuds.app"
+            android:targetClass="com.openbuds.app.ui.MainActivity" />
+    </shortcut>
+</shortcuts>

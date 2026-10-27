@@ -7,6 +7,7 @@ The codebase is Kotlin Multiplatform: the protocol engine and device driver are 
 [![CI](https://github.com/ket0x4/openbuds/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ket0x4/openbuds/actions/workflows/ci.yml)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Android](https://img.shields.io/badge/Android-31%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## Repository layout
 
@@ -170,4 +171,4 @@ The workflow in [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on e
 
 ## License
 
-No license has been added to this repository yet. Until one is provided, the code is not licensed for reuse.
+This project is licensed under the GNU General Public License v3.0 - see the [LICENSE](LICENSE) file for details.

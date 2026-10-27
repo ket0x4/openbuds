@@ -1,6 +1,7 @@
 package com.openbuds.app.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -195,11 +196,58 @@ class TopLevelBackStack<T : Any>(startKey: T) {
 
 class MainActivity : ComponentActivity() {
 
+    companion object {
+        const val ACTION_TOGGLE_ANC = "com.openbuds.app.action.TOGGLE_ANC"
+        const val ACTION_RECONNECT = "com.openbuds.app.action.RECONNECT"
+        const val EXTRA_ROUTE = "route"
+        const val ROUTE_BUDS = "buds"
+        const val ROUTE_AUDIO = "audio"
+        const val ROUTE_DEVICES = "devices"
+        const val ROUTE_CONTROLS = "controls"
+    }
+
+    private var targetRoute by mutableStateOf<OpenBudsTopRoute?>(null)
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: Intent?) {
+        if (intent == null) return
+        val app = application as? OpenBudsApp ?: return
+        when (intent.action) {
+            ACTION_TOGGLE_ANC -> {
+                app.container.appScope.launch {
+                    com.openbuds.app.status.HeadphonesCommands.cycleAnc(applicationContext)
+                }
+            }
+            ACTION_RECONNECT -> {
+                app.container.appScope.launch {
+                    com.openbuds.app.status.HeadphonesCommands.reconnect(applicationContext)
+                }
+            }
+        }
+        val routeExtra = intent.getStringExtra(EXTRA_ROUTE)
+        val route = when (routeExtra?.lowercase()) {
+            ROUTE_AUDIO -> AudioRoute
+            ROUTE_DEVICES -> DevicesRoute
+            ROUTE_CONTROLS -> ControlsRoute
+            ROUTE_BUDS -> BudsRoute
+            else -> null
+        }
+        if (route != null) {
+            targetRoute = route
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         window.isNavigationBarContrastEnforced = false
         super.onCreate(savedInstanceState)
         configureHighRefreshRate()
+        handleIntent(intent)
 
         val app = application as OpenBudsApp
         val connectionManager = app.container.bluetoothConnectionManager
@@ -210,6 +258,13 @@ class MainActivity : ComponentActivity() {
                 val haptic = LocalHapticFeedback.current
                 val topLevelBackStack = remember { TopLevelBackStack<OpenBudsTopRoute>(BudsRoute) }
                 var isForegroundServiceRunning by remember { mutableStateOf(false) }
+
+                LaunchedEffect(targetRoute) {
+                    targetRoute?.let { route ->
+                        topLevelBackStack.switchTopLevel(route)
+                        targetRoute = null
+                    }
+                }
 
                 // Predictive back handling via androidx.navigationevent when on secondary top-level tabs
                 val tabBackEventState = rememberNavigationEventState(NavigationEventInfo.None)

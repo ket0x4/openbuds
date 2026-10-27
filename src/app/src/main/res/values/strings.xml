@@ -2,4 +2,19 @@
     <string name="app_name">OpenBuds</string>
     <string name="battery_widget_name">Battery Status</string>
     <string name="battery_widget_description">Battery for your FreeBuds 5i and case, with quick noise-control switching</string>
+
+    <!-- Quick Settings Tile -->
+    <string name="tile_anc_label">Noise Control</string>
+    <string name="status_connecting">Connecting…</string>
+    <string name="status_disconnected">Disconnected</string>
+
+    <!-- App Shortcuts -->
+    <string name="shortcut_toggle_anc_short">Noise Control</string>
+    <string name="shortcut_toggle_anc_long">Toggle Noise Control</string>
+    <string name="shortcut_audio_short">Audio &amp; EQ</string>
+    <string name="shortcut_audio_long">Audio &amp; Equalizer</string>
+    <string name="shortcut_devices_short">Devices</string>
+    <string name="shortcut_devices_long">Paired Devices</string>
+    <string name="shortcut_reconnect_short">Reconnect</string>
+    <string name="shortcut_reconnect_long">Reconnect Earbuds</string>
 </resources>
