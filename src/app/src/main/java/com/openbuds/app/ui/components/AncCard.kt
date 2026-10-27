@@ -21,6 +21,9 @@ import androidx.compose.foundation.style.*
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ButtonGroupScope
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalToggleButton
+import androidx.compose.material3.FilledTonalToggleButtonDefaults
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialShapes
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.ToggleButtonShapes
-import androidx.compose.material3.TonalToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -78,6 +80,7 @@ fun ExpressiveAncCard(
             )
 
             ButtonGroup(
+                overflowIndicator = {},
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                 expandedRatio = ButtonGroupDefaults.ExpandedRatio,
                 modifier = Modifier
@@ -87,68 +90,81 @@ fun ExpressiveAncCard(
                     .padding(5.dp)
             ) {
                 modes.forEachIndexed { index, (mode, label) ->
-                    val isSelected = currentMode == mode
-                    val interactionSource = remember(mode) { MutableInteractionSource() }
-                    val itemWeight by animateFloatAsState(
-                        targetValue = if (isSelected) 1.24f else 1f,
-                        animationSpec = motion.fastSpatialSpec(),
-                        label = "AncModeWeight"
-                    )
-                    val secondaryTint = when (mode) {
-                        AncMode.NOISE_CANCELLATION -> MaterialTheme.colorScheme.primary
-                        AncMode.TRANSPARENCY -> MaterialTheme.colorScheme.tertiary
-                        AncMode.OFF -> MaterialTheme.colorScheme.secondary
-                    }
-                    val shapes = when (index) {
-                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    }
-
-                    TonalToggleButton(
-                        checked = isSelected,
-                        onCheckedChange = {
-                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            onModeSelected(mode)
-                        },
-                        shapes = shapes,
-                        colors = ToggleButtonDefaults.tonalToggleButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.45f),
-                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                        ),
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
-                        interactionSource = interactionSource,
-                        modifier = Modifier
-                            .weight(itemWeight)
-                            .animateWidth(interactionSource)
-                    ) {
-                        val contentColor = LocalContentColor.current
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            AncModeExpressiveIcon(
-                                mode = mode,
-                                isSelected = isSelected,
-                                primaryTint = contentColor,
-                                secondaryTint = secondaryTint,
-                                modifier = Modifier.size(28.dp)
+                    customItem(
+                        buttonGroupContent = {
+                            val isSelected = currentMode == mode
+                            val interactionSource = remember(mode) { MutableInteractionSource() }
+                            val itemWeight by animateFloatAsState(
+                                targetValue = if (isSelected) 1.24f else 1f,
+                                animationSpec = motion.fastSpatialSpec(),
+                                label = "AncModeWeight"
                             )
-                            Spacer(modifier = Modifier.height(5.dp))
-                            Text(
-                                text = label,
-                                style = if (isSelected) {
-                                    MaterialTheme.typography.labelMediumEmphasized
-                                } else {
-                                    MaterialTheme.typography.labelMedium
+                            val secondaryTint = when (mode) {
+                                AncMode.NOISE_CANCELLATION -> MaterialTheme.colorScheme.primary
+                                AncMode.TRANSPARENCY -> MaterialTheme.colorScheme.tertiary
+                                AncMode.OFF -> MaterialTheme.colorScheme.secondary
+                            }
+                            val shapes = when (index) {
+                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                modes.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                            }
+
+                            FilledTonalToggleButton(
+                                checked = isSelected,
+                                onCheckedChange = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    onModeSelected(mode)
                                 },
-                                color = contentColor,
-                                maxLines = 1
+                                shapes = shapes,
+                                colors = FilledTonalToggleButtonDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.45f),
+                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                ),
+                                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+                                interactionSource = interactionSource,
+                                modifier = Modifier
+                                    .weight(itemWeight)
+                                    .animateWidth(interactionSource)
+                            ) {
+                                val contentColor = LocalContentColor.current
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.Center
+                                ) {
+                                    AncModeExpressiveIcon(
+                                        mode = mode,
+                                        isSelected = isSelected,
+                                        primaryTint = contentColor,
+                                        secondaryTint = secondaryTint,
+                                        modifier = Modifier.size(28.dp)
+                                    )
+                                    Spacer(modifier = Modifier.height(5.dp))
+                                    Text(
+                                        text = label,
+                                        style = if (isSelected) {
+                                            MaterialTheme.typography.labelMediumEmphasized
+                                        } else {
+                                            MaterialTheme.typography.labelMedium
+                                        },
+                                        color = contentColor,
+                                        maxLines = 1
+                                    )
+                                }
+                            }
+                        },
+                        menuContent = { state ->
+                            DropdownMenuItem(
+                                text = { Text(label) },
+                                onClick = {
+                                    onModeSelected(mode)
+                                    state.dismiss()
+                                }
                             )
                         }
-                    }
+                    )
                 }
             }
 
@@ -173,6 +189,7 @@ fun ExpressiveAncCard(
                     )
 
                     ButtonGroup(
+                        overflowIndicator = {},
                         horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                         expandedRatio = ButtonGroupDefaults.ExpandedRatio,
                         modifier = Modifier
@@ -182,21 +199,34 @@ fun ExpressiveAncCard(
                             .padding(4.dp)
                     ) {
                         levels.forEachIndexed { index, (level, name, bars) ->
-                            val selected = currentLevel == level
-                            val shapes = when (index) {
-                                0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                levels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                            }
-                            StrengthChip(
-                                name = name,
-                                intensityBars = bars,
-                                isDynamic = level == AncLevel.DYNAMIC,
-                                isSelected = selected,
-                                shapes = shapes,
-                                onClick = {
-                                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                                    onLevelSelected(level)
+                            customItem(
+                                buttonGroupContent = {
+                                    val selected = currentLevel == level
+                                    val shapes = when (index) {
+                                        0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                        levels.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                                    }
+                                    StrengthChip(
+                                        name = name,
+                                        intensityBars = bars,
+                                        isDynamic = level == AncLevel.DYNAMIC,
+                                        isSelected = selected,
+                                        shapes = shapes,
+                                        onClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                            onLevelSelected(level)
+                                        }
+                                    )
+                                },
+                                menuContent = { state ->
+                                    DropdownMenuItem(
+                                        text = { Text(name) },
+                                        onClick = {
+                                            onLevelSelected(level)
+                                            state.dismiss()
+                                        }
+                                    )
                                 }
                             )
                         }
@@ -238,7 +268,7 @@ private fun ButtonGroupScope.StrengthChip(
         checked = isSelected,
         onCheckedChange = { onClick() },
         shapes = shapes,
-        colors = ToggleButtonDefaults.toggleButtonColors(
+        colors = ToggleButtonDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.45f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             checkedContainerColor = MaterialTheme.colorScheme.primary,

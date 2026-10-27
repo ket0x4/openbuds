@@ -23,7 +23,10 @@ import androidx.compose.foundation.style.*
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalToggleButton
+import androidx.compose.material3.FilledTonalToggleButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.LocalContentColor
@@ -32,12 +35,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedListItem
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButtonDefaults
-import androidx.compose.material3.TonalToggleButton
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,7 +108,7 @@ fun GesturesScreen(
     val coroutineScope = rememberCoroutineScope()
 
     var activeSelectionGesture by remember { mutableStateOf<GestureType?>(null) }
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
 
     Column(
         modifier = modifier
@@ -507,64 +510,79 @@ private fun PressAndHoldCard(
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         modePairs.chunked(2).forEach { rowItems ->
                             ButtonGroup(
+                                overflowIndicator = {},
                                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                                 expandedRatio = ButtonGroupDefaults.ExpandedRatio,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 rowItems.forEachIndexed { index, (modeSet, label) ->
-                                    val selected = holdAncModes == modeSet
-                                    val interactionSource = remember(modeSet) { MutableInteractionSource() }
-                                    val itemWeight by animateFloatAsState(
-                                        targetValue = if (selected) 1.20f else 1f,
-                                        animationSpec = motion.fastSpatialSpec(),
-                                        label = "HoldAncModeWeight"
-                                    )
-                                    val shapes = if (index == 0) {
-                                        ButtonGroupDefaults.connectedLeadingButtonShapes()
-                                    } else {
-                                        ButtonGroupDefaults.connectedTrailingButtonShapes()
-                                    }
-
-                                    TonalToggleButton(
-                                        checked = selected,
-                                        enabled = isConnected,
-                                        onCheckedChange = { onHoldAncModesSelected(modeSet) },
-                                        shapes = shapes,
-                                        colors = ToggleButtonDefaults.tonalToggleButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.65f),
-                                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                            checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                                            checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                                        ),
-                                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 12.dp),
-                                        interactionSource = interactionSource,
-                                        modifier = Modifier
-                                            .weight(itemWeight)
-                                            .animateWidth(interactionSource)
-                                    ) {
-                                        val fgColor = LocalContentColor.current
-                                        Row(
-                                            verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                        ) {
-                                            Icon(
-                                                imageVector = PhosphorIcons.Duotone.Waveform,
-                                                contentDescription = null,
-                                                tint = fgColor,
-                                                modifier = Modifier.size(14.dp)
+                                    customItem(
+                                        buttonGroupContent = {
+                                            val selected = holdAncModes == modeSet
+                                            val interactionSource = remember(modeSet) { MutableInteractionSource() }
+                                            val itemWeight by animateFloatAsState(
+                                                targetValue = if (selected) 1.20f else 1f,
+                                                animationSpec = motion.fastSpatialSpec(),
+                                                label = "HoldAncModeWeight"
                                             )
-                                            Text(
-                                                text = label,
-                                                style = if (selected) {
-                                                    MaterialTheme.typography.labelSmallEmphasized
-                                                } else {
-                                                    MaterialTheme.typography.labelSmall
-                                                },
-                                                color = fgColor,
-                                                maxLines = 1
+                                            val shapes = if (index == 0) {
+                                                ButtonGroupDefaults.connectedLeadingButtonShapes()
+                                            } else {
+                                                ButtonGroupDefaults.connectedTrailingButtonShapes()
+                                            }
+
+                                            FilledTonalToggleButton(
+                                                checked = selected,
+                                                enabled = isConnected,
+                                                onCheckedChange = { onHoldAncModesSelected(modeSet) },
+                                                shapes = shapes,
+                                                colors = FilledTonalToggleButtonDefaults.colors(
+                                                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.65f),
+                                                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                                    checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                                ),
+                                                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 12.dp),
+                                                interactionSource = interactionSource,
+                                                modifier = Modifier
+                                                    .weight(itemWeight)
+                                                    .animateWidth(interactionSource)
+                                            ) {
+                                                val fgColor = LocalContentColor.current
+                                                Row(
+                                                    verticalAlignment = Alignment.CenterVertically,
+                                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                                ) {
+                                                    Icon(
+                                                        imageVector = PhosphorIcons.Duotone.Waveform,
+                                                        contentDescription = null,
+                                                        tint = fgColor,
+                                                        modifier = Modifier.size(14.dp)
+                                                    )
+                                                    Text(
+                                                        text = label,
+                                                        style = if (selected) {
+                                                            MaterialTheme.typography.labelSmallEmphasized
+                                                        } else {
+                                                            MaterialTheme.typography.labelSmall
+                                                        },
+                                                        color = fgColor,
+                                                        maxLines = 1
+                                                    )
+                                                }
+                                            }
+                                        },
+                                        menuContent = { state ->
+                                            DropdownMenuItem(
+                                                text = { Text(label) },
+                                                enabled = isConnected,
+                                                onClick = {
+                                                    onHoldAncModesSelected(modeSet)
+                                                    state.dismiss()
+                                                }
                                             )
                                         }
-                                    }
+                                    )
                                 }
                             }
                         }

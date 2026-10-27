@@ -5,7 +5,7 @@ OpenBuds is an Android application for managing HUAWEI FreeBuds 5i wireless earb
 The codebase is Kotlin Multiplatform: the protocol engine and device driver are platform-independent JVM modules, and the Android app layers Compose UI, background services, and a Glance home screen widget on top.
 
 [![CI](https://github.com/ket0x4/openbuds/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/ket0x4/openbuds/actions/workflows/ci.yml)
-[![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.4.21-7F52FF?logo=kotlin&logoColor=white)](https://kotlinlang.org)
 [![Android](https://img.shields.io/badge/Android-31%2B-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
 
 ## Repository layout
@@ -83,9 +83,9 @@ Build configuration:
 | `minSdk` | 31 |
 | `targetSdk` | 36 |
 | `compileSdk` | 37 |
-| Kotlin | 2.3.20 |
-| Gradle | 9.1.0 |
-| AGP | 9.0.1 |
+| Kotlin | 2.4.21 |
+| Gradle | 9.8.2 |
+| AGP | 9.4.1 |
 
 ## Getting started
 

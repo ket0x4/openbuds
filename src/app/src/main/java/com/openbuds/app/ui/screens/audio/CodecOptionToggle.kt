@@ -14,7 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.material3.ToggleButtonShapes
-import androidx.compose.material3.TonalToggleButton
+import androidx.compose.material3.FilledTonalToggleButton
+import androidx.compose.material3.FilledTonalToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -114,12 +115,12 @@ internal fun ButtonGroupScope.CodecOptionToggle(
     onClick: () -> Unit,
     iconRotation: Float = 0f
 ) {
-    TonalToggleButton(
+    FilledTonalToggleButton(
         checked = checked,
         enabled = enabled,
         onCheckedChange = { onClick() },
         shapes = shapes,
-        colors = ToggleButtonDefaults.tonalToggleButtonColors(
+        colors = FilledTonalToggleButtonDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.45f),
             contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,

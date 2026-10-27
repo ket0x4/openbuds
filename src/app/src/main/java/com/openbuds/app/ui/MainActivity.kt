@@ -32,6 +32,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.*
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalToggleButton
+import androidx.compose.material3.FilledTonalToggleButtonDefaults
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
@@ -40,7 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.ToggleButtonDefaults
-import androidx.compose.material3.TonalToggleButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -527,71 +529,85 @@ private fun ExpressiveFloatingDock(
         modifier = Modifier.fillMaxWidth()
     ) {
         ButtonGroup(
+            overflowIndicator = {},
             horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
             expandedRatio = ButtonGroupDefaults.ExpandedRatio,
             modifier = Modifier.fillMaxWidth()
         ) {
             TOP_LEVEL_ROUTES.forEachIndexed { index, route ->
-                val isSelected = currentRoute == route
-                val interactionSource = remember(route) { MutableInteractionSource() }
-                val itemWeight by animateFloatAsState(
-                    targetValue = if (isSelected) 1.24f else 1f,
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
-                    label = "DockTabWeight"
-                )
-                val iconScale by animateFloatAsState(
-                    targetValue = if (isSelected) 1.12f else 1f,
-                    animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
-                    label = "DockIconScale"
-                )
-                val shapes = when (index) {
-                    0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                    TOP_LEVEL_ROUTES.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                }
-
-                TonalToggleButton(
-                    checked = isSelected,
-                    onCheckedChange = { onRouteSelected(route) },
-                    shapes = shapes,
-                    colors = ToggleButtonDefaults.tonalToggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.55f),
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
-                    interactionSource = interactionSource,
-                    modifier = Modifier
-                        .weight(itemWeight)
-                        .animateWidth(interactionSource)
-                ) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (isSelected) route.selectedIcon else route.unselectedIcon,
-                            contentDescription = route.label,
-                            modifier = Modifier
-                                .size(18.dp)
-                                .graphicsLayer {
-                                    scaleX = iconScale
-                                    scaleY = iconScale
-                                }
+                customItem(
+                    buttonGroupContent = {
+                        val isSelected = currentRoute == route
+                        val interactionSource = remember(route) { MutableInteractionSource() }
+                        val itemWeight by animateFloatAsState(
+                            targetValue = if (isSelected) 1.24f else 1f,
+                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            label = "DockTabWeight"
                         )
-                        Text(
-                            text = route.label,
-                            style = if (isSelected) {
-                                MaterialTheme.typography.labelMediumEmphasized
-                            } else {
-                                MaterialTheme.typography.labelMedium
-                            },
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                        val iconScale by animateFloatAsState(
+                            targetValue = if (isSelected) 1.12f else 1f,
+                            animationSpec = MaterialTheme.motionScheme.fastSpatialSpec(),
+                            label = "DockIconScale"
+                        )
+                        val shapes = when (index) {
+                            0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                            TOP_LEVEL_ROUTES.lastIndex -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                            else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                        }
+
+                        FilledTonalToggleButton(
+                            checked = isSelected,
+                            onCheckedChange = { onRouteSelected(route) },
+                            shapes = shapes,
+                            colors = FilledTonalToggleButtonDefaults.colors(
+                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.55f),
+                                contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                checkedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                checkedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                            ),
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 10.dp),
+                            interactionSource = interactionSource,
+                            modifier = Modifier
+                                .weight(itemWeight)
+                                .animateWidth(interactionSource)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isSelected) route.selectedIcon else route.unselectedIcon,
+                                    contentDescription = route.label,
+                                    modifier = Modifier
+                                        .size(18.dp)
+                                        .graphicsLayer {
+                                            scaleX = iconScale
+                                            scaleY = iconScale
+                                        }
+                                )
+                                Text(
+                                    text = route.label,
+                                    style = if (isSelected) {
+                                        MaterialTheme.typography.labelMediumEmphasized
+                                    } else {
+                                        MaterialTheme.typography.labelMedium
+                                    },
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    },
+                    menuContent = { state ->
+                        DropdownMenuItem(
+                            text = { Text(route.label) },
+                            onClick = {
+                                onRouteSelected(route)
+                                state.dismiss()
+                            }
                         )
                     }
-                }
+                )
             }
         }
     }

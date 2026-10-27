@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -81,6 +82,7 @@ internal fun CodecSelectionCard(
             )
 
             ButtonGroup(
+                overflowIndicator = {},
                 horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween),
                 expandedRatio = ButtonGroupDefaults.ExpandedRatio,
                 modifier = Modifier
@@ -89,33 +91,61 @@ internal fun CodecSelectionCard(
                     .background(MaterialTheme.colorScheme.surfaceContainerLowest.copy(alpha = 0.65f))
                     .padding(5.dp)
             ) {
-                CodecOptionToggle(
-                    label = "AAC",
-                    subtitle = "Stable connection",
-                    checked = !isLdac,
-                    enabled = isConnected,
-                    icon = PhosphorIcons.Duotone.Broadcast,
-                    iconTint = visuals.aacIconTint,
-                    iconScale = visuals.aacIconScale,
-                    weight = visuals.aacWeight,
-                    interactionSource = aacInteractionSource,
-                    shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
-                    onClick = { onCodecSelected(CodecPreference.AAC_CONNECTION) }
+                customItem(
+                    buttonGroupContent = {
+                        CodecOptionToggle(
+                            label = "AAC",
+                            subtitle = "Stable connection",
+                            checked = !isLdac,
+                            enabled = isConnected,
+                            icon = PhosphorIcons.Duotone.Broadcast,
+                            iconTint = visuals.aacIconTint,
+                            iconScale = visuals.aacIconScale,
+                            weight = visuals.aacWeight,
+                            interactionSource = aacInteractionSource,
+                            shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
+                            onClick = { onCodecSelected(CodecPreference.AAC_CONNECTION) }
+                        )
+                    },
+                    menuContent = { state ->
+                        DropdownMenuItem(
+                            text = { Text("AAC") },
+                            enabled = isConnected,
+                            onClick = {
+                                onCodecSelected(CodecPreference.AAC_CONNECTION)
+                                state.dismiss()
+                            }
+                        )
+                    }
                 )
 
-                CodecOptionToggle(
-                    label = "LDAC",
-                    subtitle = "Hi-Res 990 kbps",
-                    checked = isLdac,
-                    enabled = isConnected,
-                    icon = PhosphorIcons.Fill.Lightning,
-                    iconTint = visuals.ldacIconTint,
-                    iconScale = visuals.ldacIconScale,
-                    iconRotation = visuals.ldacIconRotation,
-                    weight = visuals.ldacWeight,
-                    interactionSource = ldacInteractionSource,
-                    shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
-                    onClick = { onCodecSelected(CodecPreference.LDAC_QUALITY) }
+                customItem(
+                    buttonGroupContent = {
+                        CodecOptionToggle(
+                            label = "LDAC",
+                            subtitle = "Hi-Res 990 kbps",
+                            checked = isLdac,
+                            enabled = isConnected,
+                            icon = PhosphorIcons.Fill.Lightning,
+                            iconTint = visuals.ldacIconTint,
+                            iconScale = visuals.ldacIconScale,
+                            iconRotation = visuals.ldacIconRotation,
+                            weight = visuals.ldacWeight,
+                            interactionSource = ldacInteractionSource,
+                            shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
+                            onClick = { onCodecSelected(CodecPreference.LDAC_QUALITY) }
+                        )
+                    },
+                    menuContent = { state ->
+                        DropdownMenuItem(
+                            text = { Text("LDAC") },
+                            enabled = isConnected,
+                            onClick = {
+                                onCodecSelected(CodecPreference.LDAC_QUALITY)
+                                state.dismiss()
+                            }
+                        )
+                    }
                 )
             }
 
