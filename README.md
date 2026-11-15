@@ -44,6 +44,21 @@ The Gradle project lives in [`src/`](src). The repository root holds only projec
 
 New devices should be added as sibling driver modules behind `:core` interfaces so the app layer stays device-agnostic.
 
+### App layer composition
+
+`BluetoothConnectionManager` is a connection facade rather than a catch-all: it owns the RFCOMM
+link and the active driver, and delegates the rest. Bonded-device queries live in
+`DeviceRegistry`, socket creation in `RfcommConnector`, device-to-driver resolution in
+`DriverFactory`, and A2DP codec selection in `A2dpCodecController`.
+
+`AppContainer` only constructs; `OpenBudsApp` starts the connection manager and
+`DeviceStatusSync`. The widget, Quick Settings tile and status notification all consume the
+single `BluetoothConnectionManager.status` flow instead of building their own pipelines.
+
+Driver modules expose a `HeadphonesMatcher` alongside the driver so the app never hardcodes
+product names. A new model ships `HeadphonesDriver` + `HeadphonesMatcher` and is registered in
+`DriverFactory`.
+
 ## Features
 
 Battery and status

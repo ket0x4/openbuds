@@ -4,7 +4,7 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import com.openbuds.app.status.HeadphonesCommands
 import com.openbuds.core.model.AncMode
 import kotlinx.coroutines.launch
@@ -40,9 +40,9 @@ class NotificationActionReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        val app = context.applicationContext as? OpenBudsApp ?: return
+        val container = context.appContainer ?: return
         val pending = goAsync()
-        app.container.appScope.launch {
+        container.appScope.launch {
             try {
                 when (intent.action) {
                     ACTION_SET_ANC -> intent.getStringExtra(EXTRA_MODE)

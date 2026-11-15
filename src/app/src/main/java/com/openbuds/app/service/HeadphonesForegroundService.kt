@@ -6,9 +6,8 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import com.openbuds.app.status.DeviceStatus
-import com.openbuds.app.status.deviceStatus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -48,13 +47,12 @@ class HeadphonesForegroundService : Service() {
             notifications.build(CHANNEL_ID, DeviceStatus(isConnected = false, isConnecting = true)),
         )
 
-        val app = application as? OpenBudsApp ?: return
-        val manager = app.container.bluetoothConnectionManager
-        val nm = getSystemService(NotificationManager::class.java)
+        val manager = appContainer?.bluetoothConnectionManager ?: return
+        val notificationManager = getSystemService(NotificationManager::class.java)
 
         observerJob = serviceScope.launch {
-            manager.deviceStatus().collect { status ->
-                nm.notify(NOTIFICATION_ID, notifications.build(CHANNEL_ID, status))
+            manager.status.collect { status ->
+                notificationManager.notify(NOTIFICATION_ID, notifications.build(CHANNEL_ID, status))
             }
         }
     }

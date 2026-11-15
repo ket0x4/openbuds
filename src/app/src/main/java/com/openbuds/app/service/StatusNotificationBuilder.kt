@@ -21,6 +21,7 @@ import com.openbuds.app.status.StatusFormat
 import com.openbuds.app.ui.MainActivity
 import com.openbuds.core.model.AncMode
 import com.openbuds.core.model.BatteryStatus
+import com.openbuds.driver.huawei.FreeBuds5iMatcher
 
 /**
  * Builds the ongoing status notification.
@@ -31,10 +32,12 @@ import com.openbuds.core.model.BatteryStatus
  * - Android 12–15: [NotificationCompat.DecoratedCustomViewStyle] with battery bars / rings.
  * - Disconnected: plain template with a Reconnect action.
  */
-class StatusNotificationBuilder(private val context: Context) {
+class StatusNotificationBuilder(
+    private val context: Context,
+    private val deviceName: String = FreeBuds5iMatcher.displayName
+) {
 
     companion object {
-        const val DEVICE_NAME = "FreeBuds 5i"
         private val ANC_ORDER = listOf(AncMode.NOISE_CANCELLATION, AncMode.TRANSPARENCY, AncMode.OFF)
     }
 
@@ -57,7 +60,7 @@ class StatusNotificationBuilder(private val context: Context) {
         if (!status.isConnected || battery == null) {
             return base
                 .setSmallIcon(R.drawable.ic_stat_buds_off)
-                .setContentTitle(DEVICE_NAME)
+                .setContentTitle(deviceName)
                 .setContentText(if (status.isConnecting) "Connecting…" else "Disconnected")
                 .addAction(R.drawable.ic_refresh, "Reconnect", NotificationActionReceiver.reconnectIntent(context))
                 .build()
@@ -65,7 +68,7 @@ class StatusNotificationBuilder(private val context: Context) {
 
         val mode = status.ancMode ?: AncMode.OFF
         base.setSmallIcon(R.drawable.ic_stat_buds_level, StatusFormat.iconLevel(battery))
-            .setContentTitle(DEVICE_NAME)
+            .setContentTitle(deviceName)
             .setContentText(StatusFormat.batteryLine(battery))
             .setSubText(StatusFormat.ancLabel(mode))
 

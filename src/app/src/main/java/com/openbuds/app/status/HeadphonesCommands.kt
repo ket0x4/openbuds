@@ -1,7 +1,7 @@
 package com.openbuds.app.status
 
 import android.content.Context
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import com.openbuds.core.driver.HeadphonesDriver
 import com.openbuds.core.model.AncMode
 import kotlinx.coroutines.flow.filterNotNull
@@ -12,8 +12,7 @@ import kotlinx.coroutines.withTimeoutOrNull
 object HeadphonesCommands {
     private const val CONNECT_TIMEOUT_MS = 8_000L
 
-    private fun manager(context: Context) =
-        (context.applicationContext as? OpenBudsApp)?.container?.bluetoothConnectionManager
+    private fun manager(context: Context) = context.appContainer?.bluetoothConnectionManager
 
     /** Returns the active driver, auto-connecting first if needed. */
     suspend fun awaitDriver(context: Context): HeadphonesDriver? {

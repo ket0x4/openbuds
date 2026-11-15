@@ -14,6 +14,8 @@ class OpenBudsApp : Application() {
     override fun onCreate() {
         super.onCreate()
         container = AppContainer(this)
+        container.bluetoothConnectionManager.start()
+        container.deviceStatusSync.start()
         publishWidgetPreviews()
     }
 

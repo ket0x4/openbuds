@@ -81,8 +81,16 @@ data class A2dpCodecStatus(
     val sampleRateLabel: String = "48.0 kHz",
     val bitsPerSampleLabel: String = "16-bit",
     val bitrateLabel: String = "256 kbps",
-    val isLdacActive: Boolean = false
-)
+    val isLdacActive: Boolean = false,
+    /** True when the values are inferred from the saved preference instead of read from A2DP. */
+    val isEstimated: Boolean = false
+) {
+    /** Whether this reading actually reflects [preference] on the live link. */
+    fun isConfirmedFor(preference: CodecPreference): Boolean = !isEstimated && when (preference) {
+        CodecPreference.LDAC_QUALITY -> isLdacActive
+        CodecPreference.AAC_CONNECTION -> !isLdacActive
+    }
+}
 
 data class AudioSettings(
     val eqPreset: EqPreset = EqPreset.DEFAULT,

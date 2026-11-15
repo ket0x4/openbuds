@@ -1,5 +1,11 @@
 package com.openbuds.core.protocol
 
+/**
+ * One MBB frame, addressed by service and command id with tagged argument payloads.
+ *
+ * Note that [args] holds `ByteArray` values by reference: `copy()` and equality are value-based,
+ * but the buffers themselves are not defensively copied. Treat them as immutable.
+ */
 data class MbbCommand(
     val serviceId: Int,
     val commandId: Int,

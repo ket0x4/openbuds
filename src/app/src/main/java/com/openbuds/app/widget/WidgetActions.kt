@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.glance.GlanceId
 import androidx.glance.action.ActionParameters
 import androidx.glance.appwidget.action.ActionCallback
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import com.openbuds.app.status.HeadphonesCommands
 import com.openbuds.core.driver.HeadphonesDriver
 import com.openbuds.core.model.AncMode
@@ -43,6 +43,5 @@ class SetAncAction : ActionCallback {
     }
 
     private fun activeDriver(context: Context): HeadphonesDriver? =
-        (context.applicationContext as? OpenBudsApp)
-            ?.container?.bluetoothConnectionManager?.activeDriver?.value
+        context.appContainer?.bluetoothConnectionManager?.activeDriver?.value
 }

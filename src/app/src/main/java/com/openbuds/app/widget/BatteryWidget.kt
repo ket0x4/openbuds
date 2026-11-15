@@ -11,7 +11,7 @@ import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.provideContent
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import kotlinx.coroutines.launch
 
 /** Home screen battery widget: responsive Glance surface backed by persisted device state. */
@@ -36,9 +36,9 @@ class BatteryWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        val app = context.applicationContext as? OpenBudsApp ?: return
-        val manager = app.container.bluetoothConnectionManager
-        app.container.appScope.launch {
+        val container = context.appContainer ?: return
+        val manager = container.bluetoothConnectionManager
+        container.appScope.launch {
             if (manager.activeDriver.value == null) manager.autoConnect()
             manager.activeDriver.value?.refreshAll()
         }

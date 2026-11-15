@@ -4,12 +4,11 @@ import android.graphics.drawable.Icon
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import com.openbuds.app.OpenBudsApp
+import com.openbuds.app.di.appContainer
 import com.openbuds.app.R
 import com.openbuds.app.status.DeviceStatus
 import com.openbuds.app.status.HeadphonesCommands
 import com.openbuds.app.status.StatusFormat
-import com.openbuds.app.status.deviceStatus
 import com.openbuds.core.model.AncMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,12 +28,11 @@ class AncTileService : TileService() {
 
     override fun onStartListening() {
         super.onStartListening()
-        val app = applicationContext as? OpenBudsApp ?: return
-        val manager = app.container.bluetoothConnectionManager
+        val manager = appContainer?.bluetoothConnectionManager ?: return
 
         observerJob?.cancel()
         observerJob = serviceScope.launch {
-            manager.deviceStatus().collect { status ->
+            manager.status.collect { status ->
                 updateTile(status)
             }
         }
