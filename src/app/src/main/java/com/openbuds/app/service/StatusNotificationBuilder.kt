@@ -9,7 +9,6 @@ import android.content.res.Configuration
 import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
-import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.core.graphics.drawable.IconCompat

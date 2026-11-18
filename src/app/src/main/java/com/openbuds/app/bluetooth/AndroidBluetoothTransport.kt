@@ -7,13 +7,16 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InputStream
@@ -37,11 +40,13 @@ class AndroidBluetoothTransport(
 
     private val closedOnce = AtomicBoolean(false)
 
-    private val _incoming = MutableSharedFlow<ByteArray>(
-        extraBufferCapacity = 64,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
-    override val incoming: Flow<ByteArray> = _incoming.asSharedFlow()
+    // Unsolicited frames (wear detection, ANC changes made on the buds) must never be dropped:
+    // losing one leaves the UI showing stale state until the next unrelated event.
+    private val _incoming = Channel<ByteArray>(Channel.UNLIMITED)
+    override val incoming: Flow<ByteArray> = _incoming.receiveAsFlow()
+
+    // RFCOMM cannot interleave two writes; concurrent commands would corrupt each other's frames.
+    private val sendMutex = Mutex()
 
     private val _closed = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
     val closed: SharedFlow<Unit> = _closed.asSharedFlow()
@@ -56,7 +61,7 @@ class AndroidBluetoothTransport(
                 while (isActive && socket.isConnected) {
                     val bytesRead = inputStream.read(buffer)
                     if (bytesRead > 0) {
-                        _incoming.emit(buffer.copyOfRange(0, bytesRead))
+                        _incoming.send(buffer.copyOfRange(0, bytesRead))
                     } else if (bytesRead == -1) {
                         break
                     }
@@ -70,15 +75,18 @@ class AndroidBluetoothTransport(
     }
 
     override suspend fun send(data: ByteArray) {
-        withContext(Dispatchers.IO) {
-            try {
-                if (socket.isConnected) {
+        sendMutex.withLock {
+            withContext(Dispatchers.IO) {
+                try {
+                    // A dead socket throws instead of silently swallowing the frame, so callers
+                    // never apply optimistic state for a command the buds never received.
+                    if (!socket.isConnected) throw IOException("RFCOMM socket is not connected")
                     outputStream.write(data)
                     outputStream.flush()
+                } catch (e: IOException) {
+                    closeInternal()
+                    throw e
                 }
-            } catch (e: IOException) {
-                closeInternal()
-                throw e
             }
         }
     }

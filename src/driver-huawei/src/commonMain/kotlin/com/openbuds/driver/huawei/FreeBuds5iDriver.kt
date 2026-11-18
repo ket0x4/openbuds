@@ -37,6 +37,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 /**
  * HUAWEI FreeBuds 5i driver.
@@ -60,6 +62,10 @@ class FreeBuds5iDriver(
 
     private var readerJob: Job? = null
     private var watchdogJob: Job? = null
+    private var ancConfirmJob: Job? = null
+
+    /** Guards read-modify-write of the ANC pair so concurrent senders cannot mix stale halves. */
+    private val ancMutex = Mutex()
 
     private val _deviceInfo = MutableStateFlow(initialDeviceInfo)
     override val deviceInfo: StateFlow<DeviceInfo> = _deviceInfo.asStateFlow()
@@ -104,8 +110,11 @@ class FreeBuds5iDriver(
         if (enableWatchdog) {
             watchdogJob = driverScope.launch {
                 while (isActive) {
-                    delay(10_000)
+                    delay(WATCHDOG_INTERVAL_MS)
                     refreshBattery()
+                    // Wear state is normally pushed by the buds, but a single lost event would
+                    // leave the pods wrong until the next wear change, so it is re-read here.
+                    refreshInEar()
                 }
             }
         }
@@ -123,6 +132,7 @@ class FreeBuds5iDriver(
         refreshDeviceInfo()
         refreshBattery()
         refreshAnc()
+        refreshInEar()
         refreshAutoPause()
         refreshGestures()
         refreshAudio()
@@ -134,6 +144,8 @@ class FreeBuds5iDriver(
     private suspend fun refreshBattery() = sendCommand(HuaweiCommands.batteryQuery())
 
     private suspend fun refreshAnc() = sendCommand(HuaweiCommands.ancStatus())
+
+    private suspend fun refreshInEar() = sendCommand(HuaweiCommands.inEarStatus())
 
     private suspend fun refreshAutoPause() = sendCommand(HuaweiCommands.autoPauseGet())
 
@@ -160,23 +172,43 @@ class FreeBuds5iDriver(
     // region Noise control
 
     override suspend fun setAncMode(mode: AncMode) {
-        val sent = trySend(
-            HuaweiCommands.ancSet(
-                modeCode = HuaweiAncCodec.modeToWire(mode),
-                levelCode = HuaweiAncCodec.levelToWire(_ancLevel.value)
-            )
-        )
-        if (sent) _ancMode.value = mode
+        ancMutex.withLock {
+            val level = _ancLevel.value
+            applyAnc(mode, level)
+        }
     }
 
     override suspend fun setAncLevel(level: AncLevel) {
+        ancMutex.withLock {
+            val mode = _ancMode.value
+            applyAnc(mode, level)
+        }
+    }
+
+    /**
+     * Sends one combined ANC frame and adopts the state when the transport accepted it.
+     *
+     * `0x2b 0x2a` doubles as the status reply and the unsolicited change event, so a follow-up
+     * read lets the buds correct the optimistic value when they clamp the pair (for example a
+     * strength sent while the mode is off) instead of leaving the UI wrong until a manual refresh.
+     */
+    private suspend fun applyAnc(mode: AncMode, level: AncLevel) {
         val sent = trySend(
             HuaweiCommands.ancSet(
-                modeCode = HuaweiAncCodec.modeToWire(_ancMode.value),
+                modeCode = HuaweiAncCodec.modeToWire(mode),
                 levelCode = HuaweiAncCodec.levelToWire(level)
             )
         )
-        if (sent) _ancLevel.value = level
+        if (!sent) return
+
+        _ancMode.value = mode
+        _ancLevel.value = level
+
+        ancConfirmJob?.cancel()
+        ancConfirmJob = driverScope.launch {
+            delay(ANC_CONFIRM_DELAY_MS)
+            refreshAnc()
+        }
     }
 
     // endregion
@@ -518,9 +550,17 @@ class FreeBuds5iDriver(
 
     override fun close() {
         watchdogJob?.cancel()
+        ancConfirmJob?.cancel()
         readerJob?.cancel()
         transport.disconnect()
         driverJob.cancel()
         _connectionState.value = ConnectionState.Disconnected
+    }
+
+    private companion object {
+        /** Time the firmware needs to apply an ANC write and push the resulting state. */
+        const val ANC_CONFIRM_DELAY_MS = 400L
+
+        const val WATCHDOG_INTERVAL_MS = 10_000L
     }
 }

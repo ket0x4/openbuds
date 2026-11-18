@@ -56,7 +56,5 @@ val SurfaceContainerHighestLight = Color(0xFFDEE3E8)
 
 // Expressive Semantic Hardware Status Tokens
 val ChargingGreen = Color(0xFF34D399)
-val ChargingGreenSoft = Color(0xFF10B981)
 val BatteryLow = Color(0xFFF87171)
 val BatteryWarning = Color(0xFFFBBF24)
-val BatteryNormal = Color(0xFF34D399)

@@ -6,11 +6,16 @@ import com.openbuds.core.driver.HeadphonesDriver
 import com.openbuds.core.model.AncMode
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withTimeoutOrNull
 
 /** Commands that can be fired from outside the app UI (widget, notification actions). */
 object HeadphonesCommands {
     private const val CONNECT_TIMEOUT_MS = 8_000L
+
+    /** Serializes cycles so two quick tile taps cannot both read the same mode and repeat it. */
+    private val cycleMutex = Mutex()
 
     private fun manager(context: Context) = context.appContainer?.bluetoothConnectionManager
 
@@ -33,12 +38,13 @@ object HeadphonesCommands {
         AncMode.OFF, null -> AncMode.NOISE_CANCELLATION
     }
 
-    suspend fun cycleAnc(context: Context): AncMode? {
-        val manager = manager(context) ?: return null
-        val currentMode = manager.activeDriver.value?.ancMode?.value ?: AncMode.OFF
-        val next = nextAncMode(currentMode)
-        val success = setAncMode(context, next)
-        return if (success) next else null
+    suspend fun cycleAnc(context: Context): AncMode? = cycleMutex.withLock {
+        // Resolve the driver first: reading the mode before connecting cycles from a stale
+        // default, which made the first tap after idle jump to the wrong mode.
+        val driver = awaitDriver(context) ?: return@withLock null
+        val next = nextAncMode(driver.ancMode.value)
+        val success = runCatching { driver.setAncMode(next) }.isSuccess
+        if (success) next else null
     }
 
     suspend fun reconnect(context: Context) {

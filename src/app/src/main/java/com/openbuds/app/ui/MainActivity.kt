@@ -17,7 +17,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.*
 import androidx.compose.material3.ButtonGroup
 import androidx.compose.material3.ButtonGroupDefaults
@@ -39,11 +37,8 @@ import androidx.compose.material3.FilledTonalToggleButtonDefaults
 import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -57,12 +52,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -93,15 +86,12 @@ import com.openbuds.app.ui.screens.AudioScreen
 import com.openbuds.app.ui.screens.DashboardScreen
 import com.openbuds.app.ui.screens.DevicesScreen
 import com.openbuds.app.ui.screens.GesturesScreen
-import com.openbuds.app.ui.theme.ExpressiveStyleableSegment
 import com.openbuds.app.ui.theme.OpenBudsTheme
 import com.openbuds.app.ui.theme.colors
-import com.openbuds.app.ui.theme.expressiveSegmentWeight
 import com.openbuds.app.ui.theme.motionScheme
 import com.openbuds.core.model.AncLevel
 import com.openbuds.core.model.AncMode
 import com.openbuds.core.model.BatteryStatus
-import com.openbuds.core.model.CodecPreference
 import com.openbuds.core.model.ConnectionState
 import com.openbuds.core.model.DeviceInfo
 import com.openbuds.core.model.DeviceSettings
@@ -109,7 +99,6 @@ import com.openbuds.core.model.DualConnectState
 import com.openbuds.core.model.FitTestResult
 import com.openbuds.core.model.InEarStatus
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

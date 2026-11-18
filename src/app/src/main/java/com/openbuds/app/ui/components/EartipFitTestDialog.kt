@@ -12,7 +12,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,15 +41,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigationevent.NavigationEventInfo
@@ -71,7 +66,6 @@ import com.openbuds.app.audio.FitTestTonePlayer
 import com.openbuds.app.ui.icons.FreeBudsEarbudIllustration
 import com.openbuds.app.ui.performLongPress
 import com.openbuds.app.ui.performTick
-import com.openbuds.app.ui.theme.BatteryLow
 import com.openbuds.app.ui.theme.BatteryWarning
 import com.openbuds.app.ui.theme.ChargingGreen
 import com.openbuds.core.model.FitResult
@@ -328,6 +322,9 @@ private fun IdleStateContent(
             }
             Button(
                 onClick = onStartClick,
+                // The diagnostic needs both buds sealed in the ear; the warning above would
+                // otherwise be shown next to an action that contradicts it.
+                enabled = bothInEar,
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.weight(1f)
             ) {

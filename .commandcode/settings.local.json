@@ -1,0 +1,23 @@
+{
+  "disabledSkills": [
+    "android-intent-security",
+    "android-permissions-security",
+    "android-profiler",
+    "camerax",
+    "glance-canonical-layouts",
+    "ink-app-builder",
+    "ink-custom-brush-builder",
+    "ios-to-android",
+    "leanback-to-compose-tv-migration",
+    "litert-lm",
+    "litert-runtime",
+    "migrate-xml-views-to-jetpack-compose",
+    "ml-kit-genai-prompt-api",
+    "mlkit-agent-api",
+    "play-billing-library-version-upgrade",
+    "play-policy-insights",
+    "verified-email",
+    "wear-compose-m3",
+    "wear-widgets"
+  ]
+}

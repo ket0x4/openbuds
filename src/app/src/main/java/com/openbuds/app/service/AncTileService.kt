@@ -1,7 +1,6 @@
 package com.openbuds.app.service
 
 import android.graphics.drawable.Icon
-import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import com.openbuds.app.di.appContainer
@@ -58,12 +57,10 @@ class AncTileService : TileService() {
             tile.state = Tile.STATE_INACTIVE
             tile.icon = Icon.createWithResource(this, R.drawable.ic_noise_off)
             tile.label = getString(R.string.tile_anc_label)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                tile.subtitle = if (status.isConnecting) {
-                    getString(R.string.status_connecting)
-                } else {
-                    getString(R.string.status_disconnected)
-                }
+            tile.subtitle = if (status.isConnecting) {
+                getString(R.string.status_connecting)
+            } else {
+                getString(R.string.status_disconnected)
             }
         } else {
             val mode = status.ancMode ?: AncMode.OFF
@@ -77,11 +74,9 @@ class AncTileService : TileService() {
                 }
             )
             tile.label = getString(R.string.tile_anc_label)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                val batteryPart = status.battery?.lowestBudPercent?.let { "$it%" }
-                val ancPart = StatusFormat.ancLabel(mode)
-                tile.subtitle = if (batteryPart != null) "$ancPart · $batteryPart" else ancPart
-            }
+            val batteryPart = status.battery?.lowestBudPercent?.let { "$it%" }
+            val ancPart = StatusFormat.ancLabel(mode)
+            tile.subtitle = if (batteryPart != null) "$ancPart · $batteryPart" else ancPart
         }
 
         tile.updateTile()

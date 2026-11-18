@@ -42,6 +42,184 @@ class FreeBuds5iDriverTest {
     }
 
     @Test
+    fun testAncWriteSendsBothHalvesAndRequestsConfirmation() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        advanceUntilIdle()
+        fakeTransport.sentPackets.clear()
+
+        driver.setAncMode(AncMode.NOISE_CANCELLATION)
+        advanceUntilIdle()
+
+        assertEquals(AncMode.NOISE_CANCELLATION, driver.ancMode.value)
+        val ancWrites = fakeTransport.sentPackets
+            .map { MbbParser.parse(it) }
+            .filter { it.commandId == HuaweiConstants.COMMAND_ANC_SET }
+        assertEquals(1, ancWrites.size)
+        // Mode and level travel in one frame: mode first, then level.
+        assertEquals(1, ancWrites[0].args[1]?.get(0)?.toInt())
+        driver.close()
+    }
+
+    @Test
+    fun testAncWriteFollowsUpWithStatusQuery() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        advanceUntilIdle()
+        fakeTransport.sentPackets.clear()
+
+        driver.setAncLevel(AncLevel.ULTRA)
+        advanceUntilIdle()
+
+        // The firmware clamps or rejects silently, so the write is confirmed by re-reading.
+        val commands = fakeTransport.sentPackets.map { MbbParser.parse(it) }
+        assertTrue(commands.any { it.commandId == HuaweiConstants.COMMAND_ANC_SET })
+        assertTrue(commands.any { it.commandId == HuaweiConstants.COMMAND_ANC_STATUS })
+
+        // A pushed status then corrects the optimistic value.
+        val statusPacket = MbbSerializer.serialize(
+            MbbCommand(
+                serviceId = HuaweiConstants.SERVICE_SETTINGS,
+                commandId = HuaweiConstants.COMMAND_ANC_STATUS,
+                args = mapOf(1 to byteArrayOf(2.toByte(), 1.toByte()))
+            )
+        )
+        fakeTransport.incomingFlow.emit(statusPacket)
+        advanceUntilIdle()
+
+        assertEquals(AncMode.NOISE_CANCELLATION, driver.ancMode.value)
+        assertEquals(AncLevel.ULTRA, driver.ancLevel.value)
+        driver.close()
+    }
+
+    @Test
+    fun testSetAncModeKeepsCurrentLevel() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        advanceUntilIdle()
+
+        val levelPacket = MbbSerializer.serialize(
+            MbbCommand(
+                serviceId = HuaweiConstants.SERVICE_SETTINGS,
+                commandId = HuaweiConstants.COMMAND_ANC_STATUS,
+                args = mapOf(1 to byteArrayOf(2.toByte(), 0.toByte()))
+            )
+        )
+        fakeTransport.incomingFlow.emit(levelPacket)
+        advanceUntilIdle()
+        assertEquals(AncLevel.ULTRA, driver.ancLevel.value)
+
+        fakeTransport.sentPackets.clear()
+        driver.setAncMode(AncMode.TRANSPARENCY)
+        advanceUntilIdle()
+
+        val write = fakeTransport.sentPackets
+            .map { MbbParser.parse(it) }
+            .first { it.commandId == HuaweiConstants.COMMAND_ANC_SET }
+        // Switching mode must carry the level that was read from the buds, not the default.
+        assertEquals(2, write.args[1]?.get(0)?.toInt())
+        assertEquals(2, write.args[1]?.get(1)?.toInt())
+        driver.close()
+    }
+
+    @Test
+    fun testInEarStatusPatchKeepsUnreportedBud() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        advanceUntilIdle()
+
+        fakeTransport.incomingFlow.emit(
+            MbbSerializer.serialize(
+                MbbCommand(
+                    serviceId = HuaweiConstants.SERVICE_SETTINGS,
+                    commandId = HuaweiConstants.COMMAND_IN_EAR,
+                    args = mapOf(8 to byteArrayOf(1), 9 to byteArrayOf(1))
+                )
+            )
+        )
+        advanceUntilIdle()
+        assertTrue(driver.inEarStatus.value.leftInEar)
+        assertTrue(driver.inEarStatus.value.rightInEar)
+
+        // A frame carrying only the left bud must not clear the right bud.
+        fakeTransport.incomingFlow.emit(
+            MbbSerializer.serialize(
+                MbbCommand(
+                    serviceId = HuaweiConstants.SERVICE_SETTINGS,
+                    commandId = HuaweiConstants.COMMAND_IN_EAR,
+                    args = mapOf(8 to byteArrayOf(0))
+                )
+            )
+        )
+        advanceUntilIdle()
+
+        assertFalse(driver.inEarStatus.value.leftInEar)
+        assertTrue(driver.inEarStatus.value.rightInEar)
+        driver.close()
+    }
+
+    @Test
+    fun testRefreshAllQueriesWearDetection() = runTest {
+        val testDispatcher = StandardTestDispatcher(testScheduler)
+        val fakeTransport = FakeTransport()
+        val info = DeviceInfo("HUAWEI FreeBuds 5i", "00:11:22:33:44:55")
+        val driver = FreeBuds5iDriver(
+            transport = fakeTransport,
+            initialDeviceInfo = info,
+            enableWatchdog = false,
+            scope = CoroutineScope(testDispatcher)
+        )
+
+        driver.start()
+        advanceUntilIdle()
+
+        val queried = fakeTransport.sentPackets
+            .map { MbbParser.parse(it) }
+            .filter { it.serviceId == HuaweiConstants.SERVICE_SETTINGS }
+            .map { it.commandId }
+        // Wear state is otherwise event-only, so connecting must ask for it explicitly.
+        assertTrue(queried.contains(HuaweiConstants.COMMAND_IN_EAR))
+        assertTrue(queried.contains(HuaweiConstants.COMMAND_ANC_STATUS))
+        driver.close()
+    }
+
+    @Test
     fun testBatteryStatusUpdate() = runTest {
         val testDispatcher = StandardTestDispatcher(testScheduler)
         val fakeTransport = FakeTransport()

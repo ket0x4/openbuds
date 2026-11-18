@@ -31,6 +31,12 @@ object HuaweiCommands {
 
     fun ancStatus() = settings(HuaweiConstants.COMMAND_ANC_STATUS)
 
+    /**
+     * Wear-detection state. Some firmwares answer with an empty payload instead of the
+     * `[8]=left` / `[9]=right` tags, which the parser discards rather than misreading.
+     */
+    fun inEarStatus() = settings(HuaweiConstants.COMMAND_IN_EAR)
+
     fun autoPauseGet() = settings(HuaweiConstants.COMMAND_AUTO_PAUSE_GET)
 
     fun doubleTapGet() = settings(HuaweiConstants.COMMAND_DOUBLE_TAP_GET)
